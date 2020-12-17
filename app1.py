@@ -11,6 +11,12 @@ operand2 = '0'
 previous_button = None
 operator = None
 
+def format_number(num):
+  if num % 1 == 0:
+    return int(num)
+  else:
+    return num
+
 def calculate(x,y,action):
     if action == '+':
         return x + y
@@ -19,7 +25,7 @@ def calculate(x,y,action):
     elif action == '*':
         return x*y
     elif action == '/':
-        return x/y
+        return format_number(x/y)
 
 
 def on_click(e):
