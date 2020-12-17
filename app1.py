@@ -128,6 +128,9 @@ page.add(
     ]),
     Stack(horizontal=True,controls=[
         Button(text='C', onclick=on_click, data='C')
+    ]),
+    Stack(horizontal=True,controls=[
+        Text(id='history', value='History: ')
     ]))
 
 #operand1 = '0'
