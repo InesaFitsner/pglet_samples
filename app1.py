@@ -68,6 +68,7 @@ def on_click(e):
         if operator == None:
             operator = e.data
             operand1 = page.get_value('result')
+            page.append_value('history',operand1)
         else:
             page.set_value('result', calculate(int(operand1), int(operand2), operator)) 
             operand1 = page.get_value('result')
