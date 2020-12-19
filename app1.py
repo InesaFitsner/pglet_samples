@@ -10,6 +10,7 @@ operand1 = '0'
 operand2 = '0'
 previous_button = None
 operator = None
+history_id = None
 
 def format_number(num):
   if num % 1 == 0:
@@ -37,6 +38,7 @@ def on_click(e):
     global operand2
     global previous_button
     global operator
+    global history_id
     
     #operand1 = page.get_value('result')
 
@@ -57,26 +59,26 @@ def on_click(e):
                 page.set_value('result', operand2 + e.data)
                 operand2 = operand2 + e.data
                 #page.append_value('history',operand2)
-            page.append_value('history',page.get_value('result'))
+            page.append_value(history_id ,page.get_value('result'))
 
     elif e.data == 'C':
         page.set_value('result', '0')
         operand1 = '0'
         operand2 = '0'
         operator = None
-        page.append_value('history','\nHistory:')
+        history_id = page.add(Text(value='History: ')).id
 
     elif e.data in ('+','-','*','/'):
         if operator == None:
             operator = e.data
             operand1 = page.get_value('result')
-            page.append_value('history',operand1 + operator)
+            page.append_value(history_id ,operand1 + operator)
         else:
             page.set_value('result', calculate(int(operand1), int(operand2), operator)) 
             operand1 = page.get_value('result')
             operand2 = '0'
             operator = e.data
-            page.append_value('history',operand1 + operator)    
+            page.append_value(history_id ,'='+ operand1 + operator)    
 
     elif e.data == '=':
 
@@ -84,7 +86,7 @@ def on_click(e):
         operator == None
         operand1 = page.get_value('result')
         operand2 = '0'
-        page.append_value('history','\n'+' = ' + page.get_value('result'))
+        page.append_value(history_id ,'\n'+' = ' + page.get_value('result'))
 
 
     #elif e.data in ('+','-','*','/'):
@@ -102,6 +104,7 @@ def on_click(e):
 #dd=Dropdown(id="list2", label="Select your product:", options=products)
 #page.add(dd)
 
+history = Text(value='History: ')
 
 page.add(
     Stack(horizontal=True,controls=[
@@ -135,8 +138,10 @@ page.add(
         Button(text='C', onclick=on_click, data='C')
     ]),
     Stack(horizontal=True,controls=[
-        Text(id='history', value='History: ')
+        history
     ]))
+
+history_id = history.id
 
 #operand1 = '0'
 #operand2 = None
