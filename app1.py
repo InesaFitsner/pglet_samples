@@ -59,7 +59,8 @@ def on_click(e):
                 page.set_value('result', operand2 + e.data)
                 operand2 = operand2 + e.data
                 #page.append_value('history',operand2)
-            page.append_value(history_id ,page.get_value('result'))
+            #page.append_value(history_id ,page.get_value('result')) 
+        page.append_value(history_id ,e.data)
 
     elif e.data == 'C':
         page.set_value('result', '0')
@@ -72,7 +73,8 @@ def on_click(e):
         if operator == None:
             operator = e.data
             operand1 = page.get_value('result')
-            page.append_value(history_id ,operand1 + operator)
+            #page.append_value(history_id ,operand1 + operator)
+            page.append_value(history_id , operator)
         else:
             page.set_value('result', calculate(float(operand1), float(operand2), operator)) 
             operand1 = page.get_value('result')
