@@ -20,11 +20,11 @@ def format_number(num):
 
 def calculate(x,y,action):
     if action == '+':
-        return x + y
+        return format_number(x + y)
     elif action == '-':
-        return x - y
+        return format_number(x - y)
     elif action == '*':
-        return x*y
+        return format_number(x*y)
     elif action == '/':
         return format_number(x/y)
 
@@ -43,7 +43,7 @@ def on_click(e):
     #operand1 = page.get_value('result')
 
     
-    if e.data in ('1','2','3','4','5','6','7','8','9','0'):
+    if e.data in ('1','2','3','4','5','6','7','8','9','0','.'):
         if operator == None:
             if operand1 == '0':
                 page.set_value('result', e.data)
@@ -74,7 +74,7 @@ def on_click(e):
             operand1 = page.get_value('result')
             page.append_value(history_id ,operand1 + operator)
         else:
-            page.set_value('result', calculate(int(operand1), int(operand2), operator)) 
+            page.set_value('result', calculate(float(operand1), float(operand2), operator)) 
             operand1 = page.get_value('result')
             operand2 = '0'
             operator = e.data
@@ -82,7 +82,7 @@ def on_click(e):
 
     elif e.data == '=':
 
-        page.set_value('result', calculate(int(operand1), int(operand2), operator))   
+        page.set_value('result', calculate(float(operand1), float(operand2), operator))   
         operator == None
         operand1 = page.get_value('result')
         operand2 = '0'
