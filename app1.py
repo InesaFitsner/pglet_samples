@@ -10,16 +10,23 @@ operand1 = '0'
 operand2 = '0'
 previous_button = None
 operator = None
+history_id = None
+
+def format_number(num):
+  if num % 1 == 0:
+    return int(num)
+  else:
+    return num
 
 def calculate(x,y,action):
     if action == '+':
-        return x + y
+        return format_number(x + y)
     elif action == '-':
-        return x - y
+        return format_number(x - y)
     elif action == '*':
-        return x*y
+        return format_number(x*y)
     elif action == '/':
-        return x/y
+        return format_number(x/y)
 
 
 def on_click(e):
@@ -31,11 +38,12 @@ def on_click(e):
     global operand2
     global previous_button
     global operator
+    global history_id
     
     #operand1 = page.get_value('result')
 
     
-    if e.data in ('1','2','3','4','5','6','7','8','9','0'):
+    if e.data in ('1','2','3','4','5','6','7','8','9','0','.'):
         if operator == None:
             if operand1 == '0':
                 page.set_value('result', e.data)
@@ -50,30 +58,37 @@ def on_click(e):
             else:
                 page.set_value('result', operand2 + e.data)
                 operand2 = operand2 + e.data
-
+                #page.append_value('history',operand2)
+            #page.append_value(history_id ,page.get_value('result')) 
+        page.append_value(history_id ,e.data)
 
     elif e.data == 'C':
         page.set_value('result', '0')
         operand1 = '0'
         operand2 = '0'
         operator = None
+        history_id = page.add(Text(value='History: ')).id
 
     elif e.data in ('+','-','*','/'):
         if operator == None:
             operator = e.data
             operand1 = page.get_value('result')
+            #page.append_value(history_id ,operand1 + operator)
+            page.append_value(history_id , operator)
         else:
-            page.set_value('result', calculate(int(operand1), int(operand2), operator)) 
+            page.set_value('result', calculate(float(operand1), float(operand2), operator)) 
             operand1 = page.get_value('result')
             operand2 = '0'
-            operator = e.data    
+            operator = e.data
+            page.append_value(history_id ,'='+ operand1 + operator)    
 
     elif e.data == '=':
 
-        page.set_value('result', calculate(int(operand1), int(operand2), operator))   
+        page.set_value('result', calculate(float(operand1), float(operand2), operator))   
         operator == None
         operand1 = page.get_value('result')
         operand2 = '0'
+        page.append_value(history_id ,'\n'+' = ' + page.get_value('result'))
 
 
     #elif e.data in ('+','-','*','/'):
@@ -91,6 +106,7 @@ def on_click(e):
 #dd=Dropdown(id="list2", label="Select your product:", options=products)
 #page.add(dd)
 
+history = Text(value='History: ')
 
 page.add(
     Stack(horizontal=True,controls=[
@@ -122,7 +138,12 @@ page.add(
     ]),
     Stack(horizontal=True,controls=[
         Button(text='C', onclick=on_click, data='C')
+    ]),
+    Stack(horizontal=True,controls=[
+        history
     ]))
+
+history_id = history.id
 
 #operand1 = '0'
 #operand2 = None
