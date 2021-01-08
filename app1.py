@@ -72,7 +72,7 @@ def on_click(e):
     elif e.data in ('+','-','*','/'):
         if operator == None:
             operator = e.data
-            operand1 = page.get_value('result')
+            #operand1 = page.get_value('result')
             #page.append_value(history_id ,operand1 + operator)
             page.append_value(history_id , operator)
         else:
@@ -86,9 +86,12 @@ def on_click(e):
 
         page.set_value('result', calculate(float(operand1), float(operand2), operator))   
         operator == None
-        operand1 = page.get_value('result')
+        #operand1 = page.get_value('result')
+        operand1 = '0'
         operand2 = '0'
-        page.append_value(history_id ,'\n'+' = ' + page.get_value('result'))
+        #page.append_value(history_id ,'\n'+' = ' + page.get_value('result'))
+        page.append_value(history_id ,' = ' + page.get_value('result'))
+        history_id = page.add(Text(value='History: ')).id
 
 
     #elif e.data in ('+','-','*','/'):
