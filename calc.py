@@ -1,14 +1,14 @@
 import pglet
 from pglet import Page, Text, Dropdown, Button, Stack, Textbox
 
-page = pglet.page("index")
-page.update(Page(title="Hello, pglet!"))
+page = pglet.page("inesa-calc")
+page.update(Page(title="Calculator"))
 page.clean()
 
 #initiation
-operand1 = '0'
-operand2 = '0'
-operator = None
+operand1 = '0' #previous value
+operator = '+'
+start_new = True #will start new sequence in the 'result' textbox
 history_id = None
 
 def format_number(num):
@@ -27,55 +27,53 @@ def calculate(x,y,action):
     elif action == '/':
         return format_number(x/y)
 
-
 def on_click(e):
     
     global operand1
-    global operand2
     global operator
     global history_id
+    global start_new
 
     
     if e.data in ('1','2','3','4','5','6','7','8','9','0','.'):
-        if operator == None:
-            page.set_value('result', format_number(float(operand1 + e.data)))
-            operand1 = page.get_value('result')     
+        #start a new sequence in the 'result' textbox
+        if start_new == True:
+            page.set_value('result', e.data)
+            start_new = False
+        
+        #continue exising sequence in the 'result' textbox
         else:
-            page.set_value('result', format_number(float(operand2 + e.data)))
-            operand2 = page.get_value('result')         
+            page.set_value('result', page.get_value('result') + e.data)
+
         page.append_value(history_id ,e.data)
 
     elif e.data == 'C':
         page.set_value('result', '0')
         operand1 = '0'
-        operand2 = '0'
-        operator = None
+        operator = '+'
+        start_new = True
         history_id = page.add(Text(value='History: ')).id
 
     elif e.data in ('+','-','*','/'):
-        if operator == None:
-            operator = e.data
-            operand1 = page.get_value('result')
-            page.append_value(history_id , operator)
-        else:
-            page.set_value('result', calculate(float(operand1), float(operand2), operator)) 
-            operand1 = page.get_value('result')
-            operand2 = '0'
-            operator = e.data
-            page.append_value(history_id ,'='+ operand1 + operator)    
+        
+        page.set_value('result', calculate(float(operand1), float(page.get_value('result')), operator)) 
+        operand1 = page.get_value('result')
+        operator = e.data
+        start_new = True
+        page.append_value(history_id ,'='+ operand1 + operator)    
 
     elif e.data == '=':
 
-        page.set_value('result', calculate(float(operand1), float(operand2), operator))   
-        operator = None
+        page.set_value('result', calculate(float(operand1), float(page.get_value('result')), operator))
+        operator = '+'
         operand1 = '0'
-        operand2 = '0'
+        start_new = True
         page.append_value(history_id ,' = ' + page.get_value('result'))
         history_id = page.add(Text(value='History: ')).id
 
 
     #page.add(Text(value=f'Operand1: {operand1}'))   
-    #page.add(Text(value=f'Operand2: {operand2}'))   
+    #page.add(Text(value='Operand2: '+ page.get_value('result')))   
     #page.add(Text(value=f'Operator: {operator}'))   
 
 
@@ -118,7 +116,4 @@ page.add(
 
 history_id = history.id
 
-#page.add(Text(value=f'Operand1: {operand1}'))
-#page.add(Text(value=f'Operand1: {operand2}'))
-#page.add(Text(value=f'Operator: {operator}'))
 page.wait_close()
