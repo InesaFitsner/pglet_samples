@@ -8,40 +8,42 @@ page.clean()
 def on_click(e):
     
     product_index = products.index(page.get_value('product'))
-    from_value = int(page.get_value('from_value'))
-    from_unit_index = unit_names.index(page.get_value('from_unit'))
-    to_unit_index = unit_names.index(page.get_value('to_unit'))
+    try:
+        from_value = float(page.get_value('from_value'))
+        #if we get here the number is int
+        page.send('set from_value errorMessage=""')
+    
+        from_unit_index = units.index(page.get_value('from_unit'))
+        to_unit_index = units.index(page.get_value('to_unit'))
 
-    #set up conversion table depending on a product density
-    density = densities[product_index]
-    Tbsp = [1, 3, 0.5, 15*density, 15, 0.0625]
-    tsp = [1/3, 1, 0.16, 5*density, 5, 0.0208333]
-    conversion_table = [Tbsp, tsp]
+        #set up unit conversion values depending on a product density
+        density = densities[product_index]
+        unit_in_ml = [15, 5, 29.5, 1/density, 1, 240]
 
-    page.set_value('to_value', from_value*conversion_table[from_unit_index][to_unit_index])
+        page.set_value('to_value', from_value*unit_in_ml[from_unit_index]/unit_in_ml[to_unit_index])
+    except ValueError:
+        page.send('set from_value errorMessage="Please enter a float number"') 
 
-products = ['Flour', 'Butter', 'Sugar', 'Water']
-densities = [120/240, 227/240, 200/240, 240/240]
-unit_names = ['Tbsp', 'tsp', 'oz', 'g', 'ml', 'cup']
+products = ['Flour', 'Butter', 'Sugar', 'Water', 'Honey']
+densities = [120/240, 227/240, 200/240, 240/240, 320/240]
+units = ['Tbsp', 'tsp', 'oz', 'g', 'ml', 'cup']
 
 
 
-page.add(Dropdown(id='product', label = 'Select product:', options = products))
+page.add(Dropdown(id='product', label = 'Select product:', options = products, value = 'Water'))
 
 page.add(
         Stack(horizontal = True, controls=[
             Text(value='Original quantity: '),
             Textbox(id='from_value', value = '0', align = 'right'),
-            Dropdown(id='from_unit', options = unit_names),
+            Dropdown(id='from_unit', options = units, value = 'g'),
             Button(text='Go', onclick=on_click, data='Go')
             ]),
         Stack(horizontal = True, controls=[
             Text(value='Converted quantity: '),
             Textbox(id='to_value', value = '0', align = 'right'),
-            Dropdown(id='to_unit', options = unit_names),
+            Dropdown(id='to_unit', options = units, value = 'g'),
             ]),
         )
-                
-#page.add()
 
 page.wait_close()
