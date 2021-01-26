@@ -1,6 +1,7 @@
 import os.path
 
-#items=['Zachary','Inna','Liza','Feodor','Alena','Isaak','Alena','Fiodar']
+#items = ['Flour', 'Butter', 'Sugar', 'Water', 'Honey']
+#densities = [120/240, 227/240, 200/240, 240/240, 320/240]
 
 def save_list(file_path, items):
     #Saves the list to the file
@@ -23,17 +24,29 @@ def save_list(file_path, items):
    
 
 def load_list(file_path):
-    #loads the list from the file
+    #loads the list of names from the file
 
     print('Load the list from:',file_path)
+    #items.clear
+    items = []
+    #open file for input
     input_file = open(file_path, 'r')
+    i=0
     for line in input_file:  
         line = line.strip()  
-        print(line)
+        items.append(line)
+        print(items[i])
+        print[i]
+        i=i+1
+
     input_file.close()
+    return items
 
-
-
-file_path='C:/Projects/Python/Test projects/test7.txt'
+file_path='C:/Projects/Python/pglet_samples/products.txt'
 #save_list(file_path, items)
-load_list(file_path)
+items = load_list(file_path)
+#i=0
+#for line in items:
+#    print(line)
+#    print(i)
+#    i=i+1
