@@ -6,7 +6,11 @@ from pglet import Page, Text, Button, Stack, Textbox, Dropdown
 from pglet.dropdown import Option
 
 class Product():
-    pass
+    def __init__(self, name, grams_in_cup):
+        self.name = name
+        self.density = float(grams_in_cup)/240
+
+
 products = []
 
 def add_product(e):
@@ -16,19 +20,19 @@ def add_product(e):
     print('Create new product')
     #create a new instance
     global products
-    new_product = Product()
+    new_product = Product(name=page.get_value('product_name'), grams_in_cup=page.get_value('grams_in_a_cup'))
     
     #add the data attributes
-    new_product.name = page.get_value('product_name')
-    new_product.density = float(page.get_value('grams_in_a_cup'))/240
+    #new_product.name = page.get_value('product_name')
+    #new_product.density = float(page.get_value('grams_in_a_cup'))/240
     products.append(new_product)
     print(products)
     save_products('C:/Projects/Python/pglet_samples/products.txt')
     
     #update list of options in product dropdown
     page.clean('product')
-    product_options = create_options(products)
-    page.add(product_options, to='product')
+    #product_options = create_options(products)
+    #page.add(product_options, to='product')
 
 def save_products(file_name):
     '''
