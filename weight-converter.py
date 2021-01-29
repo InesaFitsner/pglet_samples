@@ -3,6 +3,7 @@ import pickle
 
 import pglet
 from pglet import Page, Text, Button, Stack, Textbox, Dropdown
+from pglet.dropdown import Option
 
 class Product():
     pass
@@ -16,14 +17,18 @@ def add_product(e):
     #create a new instance
     global products
     new_product = Product()
+    
     #add the data attributes
-    #new_product.name = input('Enter the product name: ')
-    #new_product.density = input('Enter the product density: ')
     new_product.name = page.get_value('product_name')
     new_product.density = float(page.get_value('grams_in_a_cup'))/240
     products.append(new_product)
     print(products)
     save_products('C:/Projects/Python/pglet_samples/products.txt')
+    
+    #update list of options in product dropdown
+    page.clean('product')
+    product_options = create_options(products)
+    page.add(product_options, to='product')
 
 def save_products(file_name):
     '''
@@ -41,10 +46,6 @@ def load_products(file_name):
     print('Load products from ' + file_name)
     with open(file_name, 'rb') as input_file:
         products = pickle.load(input_file)
-
-#page = pglet.page("index")
-#page.update(Page(title="Weight Converter"))
-#page.clean()
 
 def convert(e):
     
@@ -70,25 +71,18 @@ def convert(e):
     except ValueError:
         page.send('set from_value errorMessage="Please enter a float number"') 
 
-#products = ['Flour', 'Butter', 'Sugar', 'Water', 'Honey', 'Icing sugar', 'Brown sugar']
-#products = load_and_save.load_list
-#densities = [120/240, 227/240, 200/240, 240/240, 320/240, 125/240, 220/240]
-
-#create initial products
-
-#add_product()
-#add_product()
-
 
 #save_products('C:/Projects/Python/pglet_samples/products.txt')
 
-load_products('C:/Projects/Python/pglet_samples/products.txt')
-
 names = []
 densities = []
-for product in products:
-    names.append(product.name)
-    densities.append(product.density)
+try:
+    load_products('C:/Projects/Python/pglet_samples/products.txt')
+    for product in products:
+        names.append(product.name)
+        densities.append(product.density)
+except:
+    print('There are no products')
 
 #print(names)
 
