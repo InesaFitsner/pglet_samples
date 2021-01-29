@@ -6,33 +6,55 @@ from pglet import Page, Text, Button, Stack, Textbox, Dropdown
 from pglet.dropdown import Option
 
 class Product():
-    def __init__(self, name, grams_in_cup):
+    def __init__(self, name, density):
         self.name = name
-        self.density = float(grams_in_cup)/240
-
-
-products = []
+        self.density = density
 
 def add_product(e):
     '''
     Reads in a new product and stores it
     '''
-    print('Create new product')
-    #create a new instance
-    global products
-    new_product = Product(name=page.get_value('product_name'), grams_in_cup=page.get_value('grams_in_a_cup'))
+    #check if product exists
+    if find_product(page.get_value('product_name'))!=None:
+        page.set_value('product_prompt', 'Product with this name already exists')
+    else:
+        #create a new instance
+        global products
+        new_product = Product(name=page.get_value('product_name'), density=float(page.get_value('grams_in_a_cup'))/240)
     
-    #add the data attributes
-    #new_product.name = page.get_value('product_name')
-    #new_product.density = float(page.get_value('grams_in_a_cup'))/240
-    products.append(new_product)
-    print(products)
-    save_products('C:/Projects/Python/pglet_samples/products.txt')
+        products.append(new_product)
+        names.append(Option(new_product.name))
+        page.set_value('product_prompt', new_product.name + ' ' + str(new_product.density))
     
-    #update list of options in product dropdown
-    page.clean('product')
-    #product_options = create_options(products)
-    #page.add(product_options, to='product')
+        #update list of products in pickled file
+        save_products('C:/Projects/Python/pglet_samples/products.txt')
+    
+        #update list of options in product dropdown
+        page.clean('product')
+        page.add(names, to='product')
+
+def edit_product(e):
+    print('Edit')
+
+def delete_product(e):
+    product = find_product(page.get_value('product_name'))
+    #check if product exists
+    if product==None:
+        page.set_value('product_prompt', 'Product with this name does not exist')
+    else:
+        del(product)
+        #update list of products in pickled file
+        save_products('C:/Projects/Python/pglet_samples/products.txt')
+    
+        #update list of options in product dropdown
+        page.clean('product')
+        page.add(names, to='product')
+
+def find_product(product_name):
+    for product in products:
+        if product_name == product.name:
+            return product
+    return None
 
 def save_products(file_name):
     '''
@@ -48,47 +70,41 @@ def load_products(file_name):
     '''
     global products
     print('Load products from ' + file_name)
-    with open(file_name, 'rb') as input_file:
-        products = pickle.load(input_file)
+    try:
+        with open(file_name, 'rb') as input_file:
+            products = pickle.load(input_file)
+    except:
+        products = []
+        print('There is no file')
+
+    global names
+    names = []
+    
+    for product in products:
+            names.append(Option(product.name))
 
 def convert(e):
+    product = find_product(page.get_value('product'))
     
-    #number of a product in a list of product names
-    product_index = names.index(page.get_value('product'))
     try:
         from_value = float(page.get_value('from_value'))
-        #if we get here the number is int
+        #if we get here the number is float
         page.send('set from_value errorMessage=""')
     
         from_unit_index = units.index(page.get_value('from_unit'))
         to_unit_index = units.index(page.get_value('to_unit'))
 
         #set up unit conversion values depending on a product density
-        density = densities[product_index]
         
-        unit_in_ml = [15, 5, 29.5, 1/float(density), 1, 240]
+        unit_in_ml = [15, 5, 29.5, 1/product.density, 1, 240]
         page.set_value('to_value', from_value*unit_in_ml[from_unit_index]/unit_in_ml[to_unit_index])
-        
-        #printing product index to check
-        #page.add(Text(value=product_index))
         
     except ValueError:
         page.send('set from_value errorMessage="Please enter a float number"') 
+    
 
 
-#save_products('C:/Projects/Python/pglet_samples/products.txt')
-
-names = []
-densities = []
-try:
-    load_products('C:/Projects/Python/pglet_samples/products.txt')
-    for product in products:
-        names.append(product.name)
-        densities.append(product.density)
-except:
-    print('There are no products')
-
-#print(names)
+load_products('C:/Projects/Python/pglet_samples/products.txt')
 
 units = ['Tbsp', 'tsp', 'oz', 'g', 'ml', 'cup']
 
@@ -97,13 +113,18 @@ page.update(Page(title="Weight Converter"))
 page.clean()
 
 page.add(
-        Stack(horizontal = True, controls=[
-            Text(value='Product name: '),
-            Textbox(id='product_name', align = 'right'),
-            Text(value='Grams in a cup: '),
-            Textbox(id='grams_in_a_cup', align = 'right'),
-            Button(text='Add', onclick=add_product, data='Add')
-            ])
+        Stack(controls=[
+            Stack(horizontal = True, controls=[
+                Text(value='Product name: '),
+                Textbox(id='product_name', align = 'right'),
+                Text(value='Grams in a cup: '),
+                Textbox(id='grams_in_a_cup', align = 'right'),
+                Button(text='Add', onclick=add_product, data='Add'),
+                Button(text='Edit', onclick=edit_product, data='Edit'),
+                Button(text='Delete', onclick=delete_product, data='Delete')
+                ]),
+            Text(id='product_prompt', value='Product prompt')
+            ])     
         )
 
 page.add(Dropdown(id='product', label = 'Select product:', options = names, value = 'Water'))
@@ -121,7 +142,5 @@ page.add(
             Dropdown(id='to_unit', options = units, value = 'g'),
             ]),
         )
-
-page.add(Text(value = names + densities))
 
 page.wait_close()
