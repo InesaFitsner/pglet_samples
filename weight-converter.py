@@ -45,6 +45,7 @@ def delete_product(e):
         del(product)
         #update list of products in pickled file
         save_products('C:/Projects/Python/pglet_samples/products.txt')
+        load_products('C:/Projects/Python/pglet_samples/products.txt')
     
         #update list of options in product dropdown
         page.clean('product')
