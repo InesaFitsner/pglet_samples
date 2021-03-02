@@ -10,6 +10,13 @@ class Product():
         self.name = name
         self.density = density
 
+class Unit:
+    def __init__(self, name, unit_type, value):
+        self.name = name
+        self.type = unit_type
+        self.value = value
+
+
 def add_product(e):
     '''
     Reads in a new product and stores it
@@ -84,21 +91,49 @@ def load_products(file_name):
     for product in products:
             names.append(Option(product.name))
 
+def find_unit(unit_name):
+    for unit in units:
+        if unit.name == unit_name:
+            return unit
+    return None
+
+def load_units():
+#create units. may be replaced with load units from file in the future
+    global units
+    units = []
+    units.append(Unit(name='cup', unit_type='volume', value=240))
+    units.append(Unit(name='Tbsp', unit_type='volume', value=15))
+    units.append(Unit(name='tsp', unit_type='volume', value=5))
+    units.append(Unit(name='fluid oz', unit_type='volume', value=29.5))
+
+    units.append(Unit(name='g', unit_type='weight', value=1))
+    units.append(Unit(name='oz', unit_type='weight', value=28))
+
+    global unit_names
+    unit_names = []
+
+    for unit in units:
+        unit_names.append(unit.name)
+
 def convert(e):
     product = find_product(page.get_value('product'))
+    from_unit = find_unit(page.get_value('from_unit'))
+    to_unit = find_unit(page.get_value('to_unit'))
     
     try:
         from_value = float(page.get_value('from_value'))
         #if we get here the number is float
         page.send('set from_value errorMessage=""')
     
-        from_unit_index = units.index(page.get_value('from_unit'))
-        to_unit_index = units.index(page.get_value('to_unit'))
+        #from_unit = page.get_value('from_unit')
+        #to_unit = page.get_value('to_unit')
+        if from_unit.type == to_unit.type:
+            to_value = from_value*from_unit.value/to_unit.value
+        else:
+            to_value = from_value*(1/product.density)*from_unit.value/to_unit.value
+        page.set_value('to_value', to_value)
 
-        #set up unit conversion values depending on a product density
-        
-        unit_in_ml = [15, 5, 29.5, 1/product.density, 1, 240]
-        page.set_value('to_value', from_value*unit_in_ml[from_unit_index]/unit_in_ml[to_unit_index])
+        #page.set_value('to_value', from_unit.ml)
         
     except ValueError:
         page.send('set from_value errorMessage="Please enter a float number"') 
@@ -106,8 +141,10 @@ def convert(e):
 
 
 load_products('C:/Projects/Python/pglet_samples/products.txt')
+load_units()
 
-units = ['Tbsp', 'tsp', 'oz', 'g', 'ml', 'cup']
+
+
 
 page = pglet.page("index")
 page.update(Page(title="Weight Converter"))
@@ -134,13 +171,13 @@ page.add(
         Stack(horizontal = True, controls=[
             Text(value='Original quantity: '),
             Textbox(id='from_value', value = '0', align = 'right'),
-            Dropdown(id='from_unit', options = units, value = 'g'),
+            Dropdown(id='from_unit', options = unit_names, value = 'g'),
             Button(text='Go', onclick=convert, data='Go')
             ]),
         Stack(horizontal = True, controls=[
             Text(value='Converted quantity: '),
             Textbox(id='to_value', value = '0', align = 'right'),
-            Dropdown(id='to_unit', options = units, value = 'g'),
+            Dropdown(id='to_unit', options = unit_names, value = 'g'),
             ]),
         )
 
