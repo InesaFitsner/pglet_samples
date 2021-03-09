@@ -52,6 +52,8 @@ class IconBrowserApp:
         result_stack = Stack(controls=stack_controls)
         self.page.add(SearchBox(id='searchbox', onchange=searchbox_changed, onsearch=enter_clicked, on_change=True), result_stack)
 
+        self.page.wait_close()
+
 # read list of icon names from file
 file_path = 'C:/Projects/Python/pglet_samples/fluent-icons-clean.txt'
 input_file = open(file_path, 'r')   

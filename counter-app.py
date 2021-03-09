@@ -34,4 +34,4 @@ class CounterApp:
             ])
         )
 
-pglet.app("inesa-counter-app", target = CounterApp, web = True)
+pglet.app("inesa-counter-app", target = CounterApp)
